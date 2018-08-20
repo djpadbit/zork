@@ -28,6 +28,7 @@ int sc_init()
 	//init screen
 	dclear();
 	text_configure(&res_font_modern, color_black);
+	keyboard_setRepeatRate(625,50);
 	return 1;
 }
 
@@ -130,8 +131,8 @@ char* sc_gets(char* str,int len)
 	ptr = 0;
 	key = 0;
 	int run = 1;
-	while (run) { // Need to use events to allow for key repeats
-		key = getkey_opt(getkey_none,0);
+	while (run) {
+		key = getkey_opt(getkey_repeat_all_keys,0);
 		switch (key) {
 			/*case KEY_LEFT:
 				if (ptr > 0) ptr--;
