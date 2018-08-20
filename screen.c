@@ -7,6 +7,7 @@
 #include <clock.h>
 #include <stdarg.h>
 #include <keyboard.h>
+//#include "file.h"
 
 int sc_init()
 {
@@ -155,6 +156,12 @@ char* sc_gets(char* str,int len)
 			case KEY_F1:
 				lower = !lower;
 				break;
+			/*case KEY_F2: to take screenshots
+				file_create("pic.dat",256*4);
+				int f = file_open("pic.dat",BFile_WriteOnly);
+				file_fwrite(display_getCurrentVRAM(),4,256,f);
+				file_close(f);
+				break;*/
 			case KEY_SHIFT:
 				shift = !shift;
 				break;

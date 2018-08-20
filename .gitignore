@@ -1,3 +1,4 @@
 *.o
 zork.elf
 zork.bin
+pic.*
