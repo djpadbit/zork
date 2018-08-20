@@ -1,2 +1,3 @@
 *.o
-zork
+zork.elf
+zork.bin

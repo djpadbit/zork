@@ -44,11 +44,14 @@ EXTERN struct {
 
 #define play_1 play_
 
-EXTERN struct {
+struct rooms {
     integer rlnt, rdesc1[200], rdesc2[200], rexit[200], ractio[200],
 	    rval[200], rflag[200];
-} rooms_;
+};
 
+EXTERN struct rooms *rooms_;
+
+#define rooms_ (*rooms_)
 #define rooms_1 rooms_
 #define eqr ((integer *)&rooms_1 + 1)
 #define rrand ((integer *)&rooms_1 + 601)
@@ -105,12 +108,15 @@ EXTERN const struct {
 
 #define xsrch_1 xsrch_
 
-EXTERN struct {
+struct objcts {
     integer olnt, odesc1[220], odesc2[220], odesco[220], oactio[220], oflag1[
 	    220], oflag2[220], ofval[220], otval[220], osize[220], ocapac[220]
 	    , oroom[220], oadv[220], ocan[220], oread[220];
-} objcts_;
+};
 
+EXTERN struct objcts *objcts_;
+
+#define objcts_ (*objcts_)
 #define objcts_1 objcts_
 #define eqo ((integer *)&objcts_1 + 1)
 
@@ -345,10 +351,13 @@ EXTERN struct {
 
 #define screen_1 screen_
 
-EXTERN struct {
+struct rmsg {
     integer mlnt, mrloc, rtext[1050];
-} rmsg_;
+};
 
+EXTERN struct rmsg *rmsg_;
+
+#define rmsg_ (*rmsg_)
 #define rmsg_1 rmsg_
 
 EXTERN const struct {
@@ -377,10 +386,13 @@ EXTERN const struct {
 
 #define hyper_1 hyper_
 
-EXTERN struct {
+struct exits {
     integer xlnt, travel[900];
-} exits_;
+};
 
+EXTERN struct exits *exits_;
+
+#define exits_ (*exits_)
 #define exits_1 exits_
 
 EXTERN struct {

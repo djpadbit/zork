@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "funcs.h"
 #include "vars.h"
+#include "screen.h"
 
 logical moveto_(nr, who)
 integer nr;
@@ -115,16 +116,16 @@ logical flg;
     }
 /* 						!ENDGAME? */
     more_output(NULL);
-    printf("Your score ");
+    sc_print("Your score ");
     if (flg)
-	printf("would be");
+	sc_print("would be");
     else
-	printf("is");
-    printf(" %d [total of %d points], in %d move", as, state_1.mxscor,
+	sc_print("is");
+    sc_print(" %d [total of %d points], in %d move", as, state_1.mxscor,
 	    state_1.moves);
     if (state_1.moves != 1)
-	printf("s");
-    printf(".\n");
+	sc_print("s");
+    sc_print(".\n");
 
     for (i = 1; i <= 10; ++i) {
 	if (as * 20 / state_1.mxscor >= rank[i - 1]) {
@@ -139,12 +140,12 @@ L50:
 
 L60:
     more_output(NULL);
-    printf("Your score in the endgame ");
+    sc_print("Your score in the endgame ");
     if (flg)
-	printf("would be");
+	sc_print("would be");
     else
-	printf("is");
-    printf(" %d [total of %d points], in %d moves.\n", state_1.egscor,
+	sc_print("is");
+    sc_print(" %d [total of %d points], in %d moves.\n", state_1.egscor,
 	   state_1.egmxsc, state_1.moves);
 
     for (i = 1; i <= 5; ++i) {

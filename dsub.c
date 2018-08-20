@@ -7,12 +7,14 @@
 #include <stdio.h>
 #include "funcs.h"
 #include "vars.h"
+#include "file.h"
+#include "screen.h"
 
 #ifndef SEEK_SET
 #define SEEK_SET (0)
 #endif
 
-extern FILE *dbfile;
+extern int dbfile;
 
 static void rspsb2nl_ P((integer, integer, integer, logical));
 
@@ -80,8 +82,8 @@ logical nl;
 /* 						!SAID SOMETHING. */
 
     x = ((- x) - 1) * 8;
-    if (fseek(dbfile, x + (long)rmsg_1.mrloc, SEEK_SET) == EOF) {
-	fprintf(stderr, "Error seeking database loc %d\n", x);
+    if (file_fseek(dbfile, x + (long)rmsg_1.mrloc, 1) == -1) {
+	sc_print("Error seeking database loc %d\n", x);
 	exit_();
     }
 
@@ -91,9 +93,9 @@ logical nl;
     while (1) {
 	integer i;
 
-	i = getc(dbfile);
-	if (i == EOF) {
-	    fprintf(stderr, "Error reading database loc %d\n", x);
+	i = file_getc(dbfile);
+	if (i == -1) {
+	    sc_print("Error reading database loc %d\n", x);
 	    exit_();
 	}
 	i ^= zkey[x & 0xf] ^ (x & 0xff);
@@ -101,28 +103,28 @@ logical nl;
 	if (i == '\0')
 	    break;
 	else if (i == '\n') {
-	    putchar('\n');
+	    sc_write('\n');
 	    if (nl)
 		more_output(NULL);
 	}
 	else if (i == '#' && y != 0) {
 	    long iloc;
 
-	    iloc = ftell(dbfile);
+	    iloc = file_ftell(dbfile);
 	    rspsb2nl_(y, 0, 0, 0);
-	    if (fseek(dbfile, iloc, SEEK_SET) == EOF) {
-		fprintf(stderr, "Error seeking database loc %d\n", iloc);
+	    if (file_fseek(dbfile, iloc, 1) == -1) {
+		sc_print("Error seeking database loc %d\n", iloc);
 		exit_();
 	    }
 	    y = z;
 	    z = 0;
 	}
 	else
-	    putchar(i);
+	    sc_write(i);
     }
 
     if (nl)
-	putchar('\n');
+	sc_write('\n');
 }
 
 /* OBJACT-- APPLY OBJECTS FROM PARSE VECTOR */
@@ -174,7 +176,7 @@ integer b;
     /* Local variables */
 
     more_output(NULL);
-    printf("PROGRAM ERROR %d, PARAMETER=%d\n", a, b);
+    sc_print("PROGRAM ERROR %d, PARAMETER=%d\n", a, b);
 
     if (debug_1.dbgflg != 0) {
 	return;
@@ -427,7 +429,7 @@ L1000:
 L1100:
     score_(0);
 /* 						!TELL SCORE. */
-    (void) fclose(dbfile);
+    file_close(dbfile);
     exit_();
 
 } /* jigsup_ */

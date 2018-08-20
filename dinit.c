@@ -5,48 +5,40 @@
 /* WRITTEN BY R. M. SUPNIK */
 
 #include <stdio.h>
-
-#ifdef __AMOS__
-#include <amos.h>
-#endif
-
+#include <ctype.h>
+#include <bfile.h>
+#include <keyboard.h>
+#include "file.h"
+#include "screen.h"
 #include "funcs.h"
+struct objcts *objcts_ = (struct objcts*)0x88040000;
+struct rooms *rooms_ = (struct rooms*)0x88043024;
+struct rmsg *rmsg_ = (struct rmsg*)0x880442e8;
+struct exits *exits_ = (struct exits*)0x88045358;
 #include "vars.h"
 
 /* This is here to avoid depending on the existence of <stdlib.h> */
 
 extern void srand P((unsigned int));
 
-FILE *dbfile;
+integer dbfile;
 
 #ifndef TEXTFILE
-#ifdef __AMOS__
-#define TEXTFILE "lib:dtextc.dat"
-#else /* ! __AMOS__ */
-#ifdef unix
-#define TEXTFILE "/usr/games/lib/dunlib/dtextc.dat"
-#else /* ! unix */
- I need a definition for TEXTFILE
-#endif /* ! unix */
-#endif /* ! __AMOS__ */
+#define TEXTFILE "dtextc.dat"
 #endif /* ! TEXTFILE */
-
-#ifndef LOCALTEXTFILE
-#define LOCALTEXTFILE "dtextc.dat"
-#endif
 
 /* Read a single two byte integer from the index file */
 
 #define rdint(indxfile) \
-    (ch = getc(indxfile), \
-     ((ch > 127) ? (ch - 256) : (ch)) * 256 + getc(indxfile))
+    (ch = file_getc(indxfile), \
+     ((ch > 127) ? (ch - 256) : (ch)) * 256 + file_getc(indxfile))
 
 /* Read a number of two byte integers from the index file */
 
 static void rdints(c, pi, indxfile)
 integer c;
 integer *pi;
-FILE *indxfile;
+integer indxfile;
 {
     integer ch;	/* Local variable for rdint */
 
@@ -61,7 +53,7 @@ FILE *indxfile;
 static void rdpartialints(c, pi, indxfile)
 integer c;
 integer *pi;
-FILE *indxfile;
+integer indxfile;
 {
     integer ch;	/* Local variable for rdint */
 
@@ -69,7 +61,7 @@ FILE *indxfile;
 	int i;
 
 	if (c < 255) {
-	    i = getc(indxfile);
+	    i = file_getc(indxfile);
 	    if (i == 255)
 		return;
 	}
@@ -88,14 +80,15 @@ FILE *indxfile;
 static void rdflags(c, pf, indxfile)
 integer c;
 logical *pf;
-FILE *indxfile;
+integer indxfile;
 {
     while (c-- != 0)
-	*pf++ = getc(indxfile);
+	*pf++ = file_getc(indxfile);
 }
 
 logical init_()
 {
+    sc_init();
     /* System generated locals */
     integer i__1;
     logical ret_val;
@@ -104,7 +97,7 @@ logical init_()
     integer xmax, r2max, dirmax, recno;
     integer i, j, k;
     register integer ch;
-    register FILE *indxfile;
+    register integer indxfile;
     integer mmax, omax, rmax, vmax, amax, cmax, fmax, smax;
 
     more_init();
@@ -333,15 +326,9 @@ L10000:
 /* INIT, PAGE 4 */
 
 /* NOW RESTORE FROM EXISTING INDEX FILE. */
-
-#ifdef __AMOS__
-    if ((dbfile = fdopen(ropen(LOCALTEXTFILE, 0), BINREAD)) == NULL &&
-	(dbfile = fdopen(ropen(TEXTFILE, 0), BINREAD)) == NULL)
-#else
-    if ((dbfile = fopen(LOCALTEXTFILE, BINREAD)) == NULL &&
-	(dbfile = fopen(TEXTFILE, BINREAD)) == NULL)
-#endif
-	goto L1950;
+    
+    if ((dbfile = file_open(TEXTFILE, BFile_ReadOnly)) < 0)
+        goto L1950;
 
     indxfile = dbfile;
 
@@ -415,7 +402,7 @@ L10000:
     rdints(rmsg_1.mlnt, &rmsg_1.rtext[0], indxfile);
 
 /* Save location of start of message text */
-    rmsg_1.mrloc = ftell(indxfile);
+    rmsg_1.mrloc = file_ftell(indxfile);
 
 /* 						!INIT DONE. */
 
@@ -441,14 +428,14 @@ L10000:
 
 L1925:
     more_output(NULL);
-    printf("%s is version %1d.%1d%c.\n", TEXTFILE, i, j, k);
+    sc_print("%s is version %1d.%1d%c.\n", TEXTFILE, i, j, k);
     more_output(NULL);
-    printf("I require version %1d.%1d%c.\n", vers_1.vmaj, vers_1.vmin,
+    sc_print("I require version %1d.%1d%c.\n", vers_1.vmaj, vers_1.vmin,
 	   vers_1.vedit);
     goto L1975;
 L1950:
     more_output(NULL);
-    printf("I can't open %s.\n", TEXTFILE);
+    sc_print("I can't open %s.\n", TEXTFILE);
 L1975:
     more_output("Suddenly a sinister, wraithlike figure appears before you,");
     more_output("seeming to float in the air.  In a low, sorrowful voice he says,");
@@ -460,6 +447,7 @@ L1975:
     more_output("                       INITIALIZATION FAILURE");
     more_output("");
     more_output("The darkness becomes all encompassing, and your vision fails.");
+    getkey_opt(getkey_none,0);
     return ret_val;
 
 } /* init_ */

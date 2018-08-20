@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include "funcs.h"
 #include "vars.h"
+#include "file.h"
+#include <bfile.h>
 
 /* DECLARATIONS */
 
@@ -16,20 +18,21 @@ void savegm_()
 {
     /* Local variables */
     integer i;
-    FILE *e;
+    int e;
 
     prsvec_1.prswon = FALSE_;
 /* 						!DISABLE GAME. */
 /* Note: save file format is different for PDP vs. non-PDP versions */
-
-    if ((e = fopen("dsave.dat", BINWRITE)) == NULL)
+    if ((e = file_create("dsave.dat", 12200)) < 0) // Hardcoded size cuz fuck you im lazy
+    goto L100;
+    if ((e = file_open("dsave.dat", BFile_WriteOnly)) < 0)
 	goto L100;
 
     gttime_(&i); 
 /* 						!GET TIME. */
 
 #define do_uio(i, zbuf, cbytes) \
-	(void) fwrite((const char *)(zbuf), (cbytes), (i), e)
+	(void) file_fwrite((const char *)(zbuf), (cbytes), (i), e)
 
     do_uio(1, &vers_1.vmaj, sizeof(integer));
     do_uio(1, &vers_1.vmin, sizeof(integer));
@@ -88,7 +91,7 @@ void savegm_()
 
 #undef do_uio
 
-    if (fclose(e) == EOF)
+    if (file_close(e) != 0)
 	goto L100;
 
     rspeak_(597);
@@ -107,17 +110,17 @@ void rstrgm_()
 {
     /* Local variables */
     integer i, j, k;
-    FILE *e;
+    int e;
 
     prsvec_1.prswon = FALSE_;
 /* 						!DISABLE GAME. */
 /* Note: save file format is different for PDP vs. non-PDP versions */
 
-    if ((e = fopen("dsave.dat", BINREAD)) == NULL)
+    if ((e = file_open("dsave.dat", BFile_ReadOnly)) < 0)
 	goto L100;
 
 #define do_uio(i, zbuf, cbytes) \
-	(void)fread((char *)(zbuf), (cbytes), (i), e)
+	(void)file_fread((char *)(zbuf), (cbytes), (i), e)
 
     do_uio(1, &i, sizeof(integer));
     do_uio(1, &j, sizeof(integer));
@@ -178,7 +181,7 @@ void rstrgm_()
     do_uio(25, &cevent_1.cflag[0], sizeof(logical));
     do_uio(25, &cevent_1.ctick[0], sizeof(integer));
 
-    (void)fclose(e);
+    (void)file_close(e);
 
     rspeak_(599);
     return;
@@ -191,7 +194,7 @@ L100:
 L200:
     rspeak_(600);
 /* 						!OBSOLETE VERSION */
-    (void)fclose(e);
+    (void)file_close(e);
 } /* rstrgm_ */
 
 /* WALK- MOVE IN SPECIFIED DIRECTION */

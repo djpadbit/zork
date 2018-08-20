@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "funcs.h"
 #include "vars.h"
+#include "screen.h"
 
 logical findxt_(dir, rm)
 integer dir;
@@ -174,8 +175,8 @@ integer n;
 L100:
     rspeak_(q);
 /* 						!ASK */
-    (void) fflush(stdout);
-    (void) fgets(ans, sizeof ans, stdin);
+    //(void) fflush(stdout);
+    sc_gets(ans, sizeof ans);
     more_input();
 /* 						!GET ANSWER */
     if (*ans == 'Y' || *ans == 'y') {

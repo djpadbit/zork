@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include "funcs.h"
 #include "vars.h"
+#include "screen.h"
 
 logical sverbs_(ri)
 integer ri;
@@ -208,7 +209,7 @@ L4100:
 
 L5000:
     more_output(NULL);
-    printf("V%1d.%1d%c\n", vers_1.vmaj, vers_1.vmin, vers_1.vedit);
+    sc_print("V%1d.%1d%c\n", vers_1.vmaj, vers_1.vmin, vers_1.vedit);
     play_1.telflg = TRUE_;
     return ret_val;
 
@@ -532,17 +533,17 @@ L21000:
     j = k % 60;
 
     more_output(NULL);
-    printf("You have been playing Dungeon for ");
+    sc_print("You have been playing Dungeon for ");
     if (i >= 1) {
-	printf("%d hour", i);
+	sc_print("%d hour", i);
 	if (i >= 2)
-	    printf("s");
-	printf(" and ");
+	    sc_print("s");
+	sc_print(" and ");
     }
-    printf("%d minute", j);
+    sc_print("%d minute", j);
     if (j != 1)
-	printf("s");
-    printf(".\n");
+	sc_print("s");
+    sc_print(".\n");
     play_1.telflg = TRUE_;
     return ret_val;
 
@@ -661,7 +662,7 @@ L25000:
 
     if (j != 0) {
 	more_output(NULL);
-	printf("You will be cured after %d moves.\n", i);
+	sc_print("You will be cured after %d moves.\n", i);
     }
 
     i__1 = k + 478;
@@ -749,7 +750,7 @@ L26400:
 /* 						!TELL HIM. */
     play_1.telflg = TRUE_;
     more_output(NULL);
-    printf("A hollow voice replies:  \"%.6s %.6s\".\n", pp1, ch);
+    sc_print("A hollow voice replies:  \"%.6s %.6s\".\n", pp1, ch);
 
     return ret_val;
 

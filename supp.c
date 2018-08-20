@@ -6,13 +6,12 @@
 #include <sys/types.h>
 #endif
 
-#ifdef BSD4_2
-#include <sys/time.h>
-#else /* ! BSD4_2 */
 #include <time.h>
-#endif /* ! BSD4_2 */
+#include <rtc.h>
 
 #include "funcs.h"
+#include "screen.h"
+#include <keyboard.h>
 
 /* Define these here to avoid using <stdlib.h> */
 
@@ -32,7 +31,8 @@ extern struct tm *localtime ();
 
 void exit_()
 {
-    fprintf(stderr, "The game is over.\n");
+    sc_print("The game is over.\n");
+    getkey_opt(getkey_none,0);
     exit(0);
 }
 
@@ -43,15 +43,17 @@ integer *hrptr;
 integer *minptr;
 integer *secptr;
 {
-	time_t timebuf;
-	struct tm *tmptr;
+	//time_t timebuf;
+	//struct tm *tmptr;
 
-	time(&timebuf);
-	tmptr = localtime(&timebuf);
+	//time(&timebuf);
+	//tmptr = localtime(&timebuf);
+    rtc_time_t time;
+    rtc_getTime(&time);
 	
-	*hrptr  = tmptr->tm_hour;
-	*minptr = tmptr->tm_min;
-	*secptr = tmptr->tm_sec;
+	*hrptr  = time.hours;
+	*minptr = time.minutes;
+	*secptr = time.seconds;
 }
 /* Random number generator */
 
@@ -200,7 +202,7 @@ void more_init()
 /* The program wants to output a line to the terminal.  If z is not
  * NULL it is a simple string which is output here; otherwise it
  * needs some sort of formatting, and is output after this function
- * returns (if all computers had vprintf I would just it, but they
+ * returns (if all computers had vprint I would just it, but they
  * probably don't).
  */
 
@@ -210,7 +212,7 @@ const char *z;
 /* pager code remarked out to allow streamed input and output */
 /*
      if (crows > 0  &&  coutput > crows - 2) {
-	printf("Press return to continue: ");
+	sc_print("Press return to continue: ");
 	(void) fflush(stdout);
 	while (getchar() != '\n')
 	    ;
@@ -218,7 +220,7 @@ const char *z;
     }
 */
     if (z != NULL)
-	printf("%s\n", z);
+	sc_print("%s\n", z);
 
     coutput++;
 }

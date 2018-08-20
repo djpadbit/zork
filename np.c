@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include "funcs.h"
 #include "vars.h"
+#include "screen.h"
 
 /* This declaration is here since many systems don't have <stdlib.h> */
 
@@ -30,18 +31,18 @@ L5:
     }
 /* 						!SEE WHO TO PROMPT FOR. */
 L10:
-    printf(">");
+    sc_print(">");
 /* 						!PROMPT FOR GAME. */
 L90:
-    (void) fflush(stdout);
-    if (fgets(buffer, 78, stdin) == NULL)
+    //(void) fflush(stdout);
+    if (sc_gets(buffer, 78) == NULL)
 	exit_();
     more_input();
 
-    if (buffer[0] == '!') {
+    /*if (buffer[0] == '!') {
 	system(buffer + 1);
 	goto L5;
-    }
+    }*/
 
     zlast = buffer - 1;
     for (z = buffer; *z != '\0' && *z != '\n'; z++) {
