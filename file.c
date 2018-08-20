@@ -45,9 +45,7 @@ int file_create(char* filename,int size)
 	}
 	int s = size;
 	r = BFile_Create(path,BFile_File,&s);
-	if (r < 0) {
-		//BFile_optimise? but we don't have that in gint sadly
-	}
+	if (r < 0) {}//BFile_optimise? but we don't have that in gint sadly
 	return r;
 }
 
@@ -79,7 +77,7 @@ int file_close(int fileidx)
 	free(files[fi]->getc_buff);
 	free(files[fi]);
 	files[fi] = NULL;
-	BFile_Close(fileidx);
+	return BFile_Close(fileidx);
 }
 
 int file_fwrite(const void *ptr, int size, int nmemb, int fileidx)
