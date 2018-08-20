@@ -47,8 +47,8 @@ TERMFLAG = -DMORE_NONE
 # Compilation flags
 LDFLAGS = `fxsdk --libs`
 CC = sh3eb-elf-gcc
-CFLAGS = -g
-#CFLAGS = -Wall -O3 -fstrength-reduce -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop  -fexpensive-optimizations -fforce-addr -fomit-frame-pointer -std=gnu99
+CFLAGS = -O3 -fstrength-reduce -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop -fexpensive-optimizations -fforce-addr -fomit-frame-pointer -std=gnu99
+#CFLAGS += -Wall
 CFLAGS += `fxsdk --cflags`
 #CFLAGS = -g #-static
 # On SCO Unix Development System 3.2.2a, the const type qualifier does
