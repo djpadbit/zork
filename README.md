@@ -11,7 +11,7 @@ This fork is a port to the casio FX range of calculators, it currently only supp
 Why did i do this ? idk cuz i had nothing else better to do.
 The code is really messy but hey i did it in like 2 days so it's not that bad.
 You can use F1 to toggle lowercase and uppercase otherwise it's just zork oh and yea you do need the dtextx.dat on the calculator aswell otherwise it won't work.
-You can't save yet (i think) but i'll fix that later right now it's 5am and i want to go to sleep.
+Saving now works.
 
 Public Domain source code to the original DUNGEON game (Zork I). Released to the PD by Infocom. Includes 
 source files, headers, and information.
