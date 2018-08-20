@@ -15,13 +15,13 @@ int sc_init()
 	//Stack overflow gud:
 	//	https://stackoverflow.com/questions/1970698/using-malloc-for-allocation-of-multi-dimensional-arrays-with-different-row-lengt
 	int i;
-	if (( sc_screenContent = (char**)malloc( SCR_NBRLINES*sizeof( char* ))) == NULL ) return 0;
-	for (i=0; i < SCR_NBRLINES; i++ ) { if (( sc_screenContent[i] = (char*)malloc( SCR_CHARSPERLINE+1 )) == NULL ) return 0; }
+	if (( sc_screenContent = (char**)calloc(1, SCR_NBRLINES*sizeof( char* ))) == NULL ) return 0;
+	for (i=0; i < SCR_NBRLINES; i++ ) { if (( sc_screenContent[i] = (char*)calloc(1, SCR_CHARSPERLINE+1 )) == NULL ) return 0; }
 
-	for(i=0;i<SCR_NBRLINES;i++)
+	/*for(i=0;i<SCR_NBRLINES;i++)
 	{
 		sc_screenContent[i][0]=0;
-	}
+	}*/
 	sc_actualLine = 0;
 	sc_scrindex = 0;
 	sc_chrindex = 0;
@@ -104,7 +104,7 @@ void sc_backspace()
 {
 	if (sc_chrindex == 0 && sc_actualLine != 0) {
 		sc_actualLine--;
-		sc_chrindex = SCR_CHARSPERLINE-1;
+		sc_chrindex = strlen(sc_screenContent[sc_actualLine])-1;
 	} else sc_chrindex--;
 }
 
@@ -151,12 +151,12 @@ char* sc_gets(char* str,int len)
 				if (ptr != 0) run = 0;
 				break;
 			case KEY_DEL: 
-				if (ptr > 0) {str[ptr--] = 0;str[ptr] = 0;sc_write(0x8);sc_write(' ');sc_write(0x8);}
+				if (ptr > 0) {str[ptr--] = 0;str[ptr] = 0;sc_write(0x8);sc_write(0x0);sc_write(0x8);}
 				break;
 			case KEY_F1:
 				lower = !lower;
 				break;
-			/*case KEY_F2: to take screenshots
+			/*case KEY_F2: //to take screenshots
 				file_create("pic.dat",256*4);
 				int f = file_open("pic.dat",BFile_WriteOnly);
 				file_fwrite(display_getCurrentVRAM(),4,256,f);
@@ -197,7 +197,12 @@ void sc_write(char data)
 	else if (data == 0x8) sc_backspace();
 	else
 	{
-		if(sc_chrindex >= SCR_CHARSPERLINE)
+		int len = text_length(sc_screenContent[sc_actualLine]);
+		//char strc[] = {sc_screenContent[sc_actualLine][sc_chrindex],0};
+		//int clen = text_length(strc);
+		char strd[] = {data,0};
+		int dlen = text_length(strd);
+		if(sc_chrindex >= SCR_CHARSPERLINE || len+dlen > 127)
 		{
 			sc_newline();
 			sc_chrindex = 0;
@@ -206,13 +211,18 @@ void sc_write(char data)
 		sc_screenContent[sc_actualLine][sc_chrindex] = data;
 		//sc_screenContent[sc_actualLine][sc_chrindex+1] = 0;
 		//Writing
+		//if (sc_scrindex+(SCR_DSPLINES-1) < sc_actualLine || (sc_scrindex+(SCR_DSPLINES-1) > sc_actualLine && sc_actualLine > (SCR_DSPLINES-1))) sc_setScrindex(sc_actualLine-(SCR_DSPLINES-1));
 		if (sc_scrindex < sc_actualLine && sc_actualLine > (SCR_DSPLINES-1) /*&& rockback*/ || sc_scrindex+(SCR_DSPLINES-1) > sc_actualLine && sc_actualLine > (SCR_DSPLINES-1) /*&& rockback*/ ) sc_setScrindex(sc_actualLine-(SCR_DSPLINES-1));
 		//if (sc_scrindex > sc_actualLine && sc_actualLine <= 10) sc_setScrindex(0);
 		//if (sc_scrindex > sc_actualLine) sc_setScrindex(sc_actualLine);
 		//else if (sc_scrindex+(SCR_DSPLINES-1) < sc_actualLine) sc_setScrindex(sc_actualLine-(SCR_DSPLINES-1));
 		else/* if (sc_actualLine > sc_scrindex && sc_actualLine < sc_scrindex+(SCR_DSPLINES-1))*/ {
-			char str[] = {data,0};
-			/*if (int(sc_actualLine/float(10)) <= sc_scrindex) */dtext(sc_chrindex*6,6*(sc_actualLine%SCR_DSPLINES),(unsigned char*)str);
+			//char str[] = {data,0};
+			drect(0,6*(sc_actualLine-sc_scrindex),len,(6*(sc_actualLine-sc_scrindex))+6,color_white);
+			/*if (data == ' ') {
+				drect(len-clen,6*MIN(SCR_DSPLINES-1,sc_actualLine),len,(6*MIN(SCR_DSPLINES-1,sc_actualLine))+6,color_white);
+			}
+			else*/ /*if (int(sc_actualLine/float(10)) <= sc_scrindex) */dtext(0,6*(sc_actualLine-sc_scrindex),sc_screenContent[sc_actualLine]);
 			//ML_display_vram_lines(6*(sc_actualLine%SCR_DSPLINES),6*((sc_actualLine%SCR_DSPLINES)+1));
 			dupdate();
 		}
@@ -242,7 +252,8 @@ void sc_newline()
 		//shifts the lines to free the last
 		for(int i=0;i<SCR_NBRLINES-1;i++)
 		{
-			for(int j=0;j<SCR_CHARSPERLINE;j++)
+			memcpy(sc_screenContent[i],sc_screenContent[i+1],SCR_CHARSPERLINE);
+			/*for(int j=0;j<SCR_CHARSPERLINE;j++)
 			{
 				if(sc_screenContent[i+1][j] == 0)
 				{
@@ -250,7 +261,7 @@ void sc_newline()
 					break;
 				}
 				sc_screenContent[i][j]=sc_screenContent[i+1][j];
-			}
+			}*/
 		}
 		memset(sc_screenContent[sc_actualLine],0,SCR_CHARSPERLINE);
 		//sc_screenContent[sc_actualLine][0] = 0;
@@ -272,7 +283,8 @@ void sc_rewritescreen()
 	dclear();
 	for(int i=0;i<SCR_DSPLINES;i++)
 	{
-		for(int j=0;j<SCR_CHARSPERLINE;j++)
+		dtext(0,i*6,sc_screenContent[i+sc_scrindex]);
+		/*for(int j=0;j<SCR_CHARSPERLINE;j++)
 		{
 			int k = i+sc_scrindex;//(SCR_DSPLINES*sc_scrindex);//(SCR_DSPLINES*int(float(sc_actualLine)/float(SCR_DSPLINES)));
 			//char cur = sc_screenContent[][j]
@@ -280,7 +292,7 @@ void sc_rewritescreen()
 				break;
 			char str[] = {sc_screenContent[k][j],0};
 			dtext(j*6,6*i,(unsigned char*)str);
-		}
+		}*/
 		// PrintMini(0,6*i,(unsigned char*)sc_screenContent[i],MINI_OVER);
 	}
 	dupdate();

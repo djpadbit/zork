@@ -4,7 +4,7 @@
 
 #define SCR_DSPLINES 10
 #define SCR_NBRLINES 200
-#define SCR_CHARSPERLINE 21
+#define SCR_CHARSPERLINE 64
 
 extern font_t res_font_modern;
 
