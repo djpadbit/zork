@@ -47,7 +47,7 @@ TERMFLAG = -DMORE_NONE
 # Compilation flags
 LDFLAGS = `fxsdk --libs`
 CC = sh3eb-elf-gcc
-CFLAGS = -O3 -fstrength-reduce -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop -fexpensive-optimizations -fforce-addr -fomit-frame-pointer -std=gnu99
+CFLAGS =
 #CFLAGS += -Wall
 CFLAGS += `fxsdk --cflags`
 #CFLAGS = -g #-static
