@@ -44,6 +44,8 @@ TERMFLAG = -DMORE_NONE
 # use except for debugging.
 #GDTFLAG = -DALLOW_GDT
 
+OPTFLAGS = -O3 -fstrength-reduce -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop  -fexpensive-optimizations -fforce-addr -fomit-frame-pointer
+
 # Compilation flags
 LDFLAGS = `fxsdk --libs`
 CC = sh3eb-elf-gcc
@@ -87,20 +89,26 @@ clean:
 dtextc.dat:
 	cat dtextc.uu1 dtextc.uu2 dtextc.uu3 dtextc.uu4 | uudecode
 
+screen.o: screen.h
+	$(CC) $(CFLAGS) $(OPTFLAGS)  -c -o screen.o screen.c
+
+file.o: file.h
+	$(CC) $(CFLAGS) $(OPTFLAGS)  -c -o file.o file.c
+
 dinit.o: dinit.c funcs.h vars.h
-	$(CC) $(LDFLAGS) $(CFLAGS) $(GDTFLAG) -c dinit.c
+	$(CC) $(CFLAGS) $(GDTFLAG)  -c -o dinit.o dinit.c
 
 dgame.o: dgame.c funcs.h vars.h
-	$(CC) $(LDFLAGS) $(CFLAGS) $(GDTFLAG) -c dgame.c
+	$(CC) $(CFLAGS) $(GDTFLAG)  -c -o dgame.o dgame.c
 
 gdt.o: gdt.c funcs.h vars.h
-	$(CC) $(LDFLAGS) $(CFLAGS) $(GDTFLAG) -c gdt.c
+	$(CC) $(CFLAGS) $(GDTFLAG)  -c -o gdt.o gdt.c
 
 local.o: local.c funcs.h vars.h
-	$(CC) $(LDFLAGS) $(CFLAGS) $(GDTFLAG) -c local.c
+	$(CC) $(CFLAGS) $(GDTFLAG)  -c -o local.o local.c
 
 supp.o: supp.c funcs.h vars.h
-	$(CC) $(LDFLAGS) $(CFLAGS) $(TERMFLAG) -c supp.c	
+	$(CC) $(CFLAGS) $(TERMFLAG)  -c -o supp.o supp.c
 
 actors.o: funcs.h vars.h
 ballop.o: funcs.h vars.h
